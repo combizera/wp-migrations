@@ -1,0 +1,26 @@
+{
+    "name": "combizera/wp-migration",
+    "description": "Package para importar posts do WordPress",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Combizera\\WpMigration\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Combizera\\WpMigration\\WpMigrationServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "Combizera",
+            "email": "ycombi349@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
