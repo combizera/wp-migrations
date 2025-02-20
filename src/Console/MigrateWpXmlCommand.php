@@ -9,9 +9,9 @@ use App\Models\Post;
 class MigrateWpXmlCommand extends Command
 {
     protected $signature = 'wp:migrate {file}';
-    protected $description = 'Migra postagens de um XML do WordPress para o banco de dados';
+    protected $description = 'Migrate posts from a WordPress XML to the database.';
 
-    public function handle()
+    public function handle(): void
     {
         $file = $this->argument('file');
 
@@ -20,17 +20,19 @@ class MigrateWpXmlCommand extends Command
             $posts = $parser->getPosts();
 
             foreach ($posts as $post) {
-                Post::create([
-                    'title' => $post->title,
-                    'slug' => \Str::slug($post->title),
-                    'content' => $post->content,
-                    'published_at' => $post->publishedAt,
+                Post::query()
+                    ->create([
+                        'title' => $post->title,
+                        'slug' => \Str::slug($post->title),
+                        'content' => $post->content,
+                        //'published_at' => $post->publishedAt,
                 ]);
             }
 
             $this->info(count($posts) . ' postagens migradas com sucesso!');
+            $this->info(count($posts) . ' posts migrate with success!');
         } catch (\Exception $e) {
-            $this->error('Erro: ' . $e->getMessage());
+            $this->error('Error: ' . $e->getMessage());
         }
     }
 }

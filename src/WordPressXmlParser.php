@@ -9,26 +9,53 @@ class WordPressXmlParser
 {
     protected SimpleXMLElement $xml;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(string $filePath)
     {
         if (!file_exists($filePath)) {
-            throw new Exception("Arquivo XML não encontrado.");
+            throw new Exception("XML File not found.");
         }
 
+        // LIBXML_NOCDATA - Merge CDATA as text nodes
         $this->xml = simplexml_load_file($filePath, "SimpleXMLElement", LIBXML_NOCDATA);
+
+        if ($this->xml === false) {
+            throw new Exception("Error loading XML file.");
+        }
     }
 
+    /**
+     * @throws Exception
+     */
     public function getPosts(): array
     {
         $posts = [];
+
+        if (!isset($this->xml->channel) || !isset($this->xml->channel->item)) {
+            throw new Exception("Invalid XML structure. Channel or items not found.");
+        }
+
         foreach ($this->xml->channel->item as $item) {
+            $namespaces = $item->getNamespaces(true);
+
+            if (isset($namespaces['content'])) {
+                $contentNamespace = $namespaces['content'];
+                $contentEncoded = $item->children($contentNamespace)->encoded;
+                $content = (string) $contentEncoded;
+            } else {
+                $content = '';
+            }
+
             $posts[] = new Post(
                 (string) $item->title,
                 (string) $item->link,
-                (string) $item->content,
-                (string) $item->pubDate
+                $content,
+                //(string) $item->pubDate
             );
         }
+
         return $posts;
     }
 }
