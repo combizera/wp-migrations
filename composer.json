@@ -24,7 +24,6 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">= 8.2",
-        "another-vendor/package": "1.*"
+        "php": ">= 8.2"
     }
 }
