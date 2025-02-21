@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use SimpleXMLElement;
 use Exception;
 
-class WordPressXmlParser
+class WpXmlParser
 {
     protected SimpleXMLElement $xml;
 

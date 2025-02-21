@@ -3,7 +3,7 @@
 namespace Combizera\WpMigration\Console;
 
 use Illuminate\Console\Command;
-use Combizera\WpMigration\WordPressXmlParser;
+use Combizera\WpMigration\WpXmlParser;
 use App\Models\Post;
 
 class MigrateWpXmlCommand extends Command
@@ -21,7 +21,7 @@ class MigrateWpXmlCommand extends Command
         $file = $this->argument('file');
 
         try {
-            $parser = new WordPressXmlParser($file);
+            $parser = new WpXmlParser($file);
             $posts = $parser->getPosts();
 
             $this->info('Starting migration...');
