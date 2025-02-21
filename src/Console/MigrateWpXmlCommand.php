@@ -3,7 +3,7 @@
 namespace Combizera\WpMigration\Console;
 
 use Illuminate\Console\Command;
-use Combizera\WpMigration\WordPressXmlParser;
+use Combizera\WpMigration\WpXmlParser;
 use App\Models\Post;
 
 class MigrateWpXmlCommand extends Command
@@ -11,12 +11,17 @@ class MigrateWpXmlCommand extends Command
     protected $signature = 'wp:migrate {file}';
     protected $description = 'Migrate posts from a WordPress XML to the database.';
 
+    /**
+     * Execute the console command.
+     *
+     * @return void
+     */
     public function handle(): void
     {
         $file = $this->argument('file');
 
         try {
-            $parser = new WordPressXmlParser($file);
+            $parser = new WpXmlParser($file);
             $posts = $parser->getPosts();
 
             $this->info('Starting migration...');
@@ -30,7 +35,7 @@ class MigrateWpXmlCommand extends Command
                         'title' => $post->title,
                         'slug' => \Str::slug($post->title),
                         'content' => $post->content,
-                        //'published_at' => $post->publishedAt,
+                        'created_at' => $post->publishedAt,
                 ]);
 
                 $bar->advance();
