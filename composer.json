@@ -21,7 +21,8 @@
             "email": "ycombi349@gmail.com"
         }
     ],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">= 8.2",
         "another-vendor/package": "1.*"
