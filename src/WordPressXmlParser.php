@@ -2,6 +2,7 @@
 
 namespace Combizera\WpMigration;
 
+use Carbon\Carbon;
 use SimpleXMLElement;
 use Exception;
 
@@ -44,16 +45,20 @@ class WordPressXmlParser
         }
 
         foreach ($this->xml->channel->item as $item) {
+            var_dump((string) $item->pubDate);
             $namespaces = $item->getNamespaces(true);
             $content = isset($namespaces['content'])
                 ? $this->parseContent($item->children($namespaces['content'])->encoded)
                 : '';
+            $publishedAt = isset($item->pubDate)
+                ? $this->parseDate((string) $item->pubDate)
+                : Carbon::now();
 
             $posts[] = new Post(
                 (string) $item->title,
                 (string) $item->link,
                 $content,
-                //(string) $item->pubDate
+                $publishedAt
             );
         }
 
@@ -81,5 +86,25 @@ class WordPressXmlParser
         ], ['','', ' '], $content);
 
         return trim(preg_replace("/[\r\n]+/", "\n", $content));
+    }
+
+    /**
+     * Convert WP date format to Laravel `created_at` format
+     *
+     * @param string $pubDate
+     * @return string
+     */
+    private function parseDate(string $pubDate): string
+    {
+        //TODO: no final do comando ele fale quantas postagens estavam sem data
+        if (empty($pubDate)) {
+            return Carbon::now()->format('Y-m-d H:i:s');
+        }
+
+        try {
+            return Carbon::createFromFormat(DATE_RSS, $pubDate)->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return Carbon::now()->format('Y-m-d H:i:s');
+        }
     }
 }
