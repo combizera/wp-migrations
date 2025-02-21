@@ -47,7 +47,7 @@ class WordPressXmlParser
 
                 $content = preg_replace([
                     '/<!--(.*?)-->/',
-                    '/\s*class="[^"]*"/',
+                    '/\s*class="wp-[^"]*"/',
                     '/\s+/'
                 ], ['','', ' '], $content);
 
