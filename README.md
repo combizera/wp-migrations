@@ -20,5 +20,16 @@ composer require combizera/wordpress-to-laravel-migrator
 
 ### Itens Necesários
 
-O seu projeto em Laravel deve ter uma `Model` para as Postagens, deve ter o nome de `Post`. Além de que nessa Model obrigatoriamente deve ter o campo `title`, `slug` e `content`.
+Para que o pacote funcione corretamente, alguns itens são necessários:
 
+- [ ] Ter uma `Model` para as Postagens, que necessariamente deve ter o nome de `Post`;
+- [ ] A `Model` deve ter os campos `title`, `slug` e `content`;
+- [ ] Ter um arquivo `.xml` com as postagens do WordPress.
+
+## Utilização
+
+Com todos os itens necessários, basta rodar o comando abaixo:
+
+```php
+php artisan wp:migrate storage/migration.xml
+```
