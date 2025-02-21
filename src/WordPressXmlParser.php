@@ -44,6 +44,15 @@ class WordPressXmlParser
                 $contentNamespace = $namespaces['content'];
                 $contentEncoded = $item->children($contentNamespace)->encoded;
                 $content = (string) $contentEncoded;
+
+                $content = preg_replace([
+                    '/<!--(.*?)-->/',
+                    '/\s*class="[^"]*"/',
+                    '/\s+/'
+                ], ['','', ' '], $content);
+
+                $content = trim(preg_replace("/[\r\n]+/", "\n", $content));
+
             } else {
                 $content = '';
             }
