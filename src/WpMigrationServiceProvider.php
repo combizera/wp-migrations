@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 
 class WpMigrationServiceProvider extends ServiceProvider
 {
-    public function register()
+    public function register(): void
     {
         $this->commands([
             MigrateWpXmlCommand::class,
@@ -15,7 +15,7 @@ class WpMigrationServiceProvider extends ServiceProvider
     }
 
 
-    public function boot()
+    public function boot(): void
     {
         // Teste para ver se o provider foi carregado
         \Log::info('WpMigrationServiceProvider carregado com sucesso!');
