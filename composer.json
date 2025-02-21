@@ -1,6 +1,6 @@
 {
-    "name": "combizera/wp-migration",
-    "description": "Package para importar posts do WordPress",
+    "name": "combizera/wordpress-to-laravel-migrator",
+    "description": "Package for migrating WordPress posts to laravel",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -22,5 +22,8 @@
         }
     ],
     "minimum-stability": "stable",
-    "require": {}
+    "require": {
+        "php": ">= 8.2",
+        "another-vendor/package": "1.*"
+    }
 }

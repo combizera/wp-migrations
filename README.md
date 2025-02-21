@@ -1,6 +1,11 @@
-# WP Migrations
+# 📝 WP Migrations
 
-Um pacote para migrar postagens do WordPress para Laravel.
+![Packagist Version](https://img.shields.io/packagist/v/combizera/wordpress-to-laravel-migrator)
+![Downloads](https://img.shields.io/packagist/dt/combizera/wordpress-to-laravel-migrator)
+![License](https://img.shields.io/github/license/combizera/wordpress-to-laravel-migrator)
+![PHP Version](https://img.shields.io/packagist/php-v/combizera/wordpress-to-laravel-migrator)
+
+Um pacote para migrar postagens do **WordPress** para **Laravel** de maneira simples e eficiente.
 
 ## Instalação
 
@@ -16,3 +21,4 @@ composer require combizera/wordpress-to-laravel-migrator
 ### Itens Necesários
 
 O seu projeto em Laravel deve ter uma `Model` para as Postagens, deve ter o nome de `Post`. Além de que nessa Model obrigatoriamente deve ter o campo `title`, `slug` e `content`.
+
