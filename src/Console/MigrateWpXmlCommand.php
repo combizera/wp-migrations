@@ -19,6 +19,11 @@ class MigrateWpXmlCommand extends Command
             $parser = new WordPressXmlParser($file);
             $posts = $parser->getPosts();
 
+            $this->info('Starting migration...');
+
+            $bar = $this->output->createProgressBar(count($posts));
+            $bar->start();
+
             foreach ($posts as $post) {
                 Post::query()
                     ->create([
@@ -27,7 +32,12 @@ class MigrateWpXmlCommand extends Command
                         'content' => $post->content,
                         //'published_at' => $post->publishedAt,
                 ]);
+
+                $bar->advance();
             }
+
+            $bar->finish();
+            $this->newLine();
 
             $this->info(count($posts) . ' posts migrate with success!');
         } catch (\Exception $e) {
