@@ -5,7 +5,7 @@ Um pacote para migrar postagens do WordPress para Laravel.
 ## Instalação
 
 ```bash
-composer require combizera/wp-migrations
+composer require combizera/wordpress-to-laravel-migrator
 ```
 
 ### Informações Importantes
