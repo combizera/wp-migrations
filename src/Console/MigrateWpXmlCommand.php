@@ -29,7 +29,6 @@ class MigrateWpXmlCommand extends Command
                 ]);
             }
 
-            $this->info(count($posts) . ' postagens migradas com sucesso!');
             $this->info(count($posts) . ' posts migrate with success!');
         } catch (\Exception $e) {
             $this->error('Error: ' . $e->getMessage());
