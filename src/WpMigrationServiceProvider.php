@@ -17,7 +17,6 @@ class WpMigrationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Teste para ver se o provider foi carregado
-        \Log::info('WpMigrationServiceProvider carregado com sucesso!');
+        \Log::info('WpMigrationServiceProvider running 🔥');
     }
 }

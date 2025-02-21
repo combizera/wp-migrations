@@ -10,7 +10,10 @@ class WordPressXmlParser
     protected SimpleXMLElement $xml;
 
     /**
+     * Load the XML file and initialize the parser
+     *
      * @throws Exception
+     * @param string $filePath
      */
     public function __construct(string $filePath)
     {
@@ -27,7 +30,10 @@ class WordPressXmlParser
     }
 
     /**
+     * Extracts and return an array of posts from the XML file
+     *
      * @throws Exception
+     * @return array
      */
     public function getPosts(): array
     {
@@ -39,23 +45,9 @@ class WordPressXmlParser
 
         foreach ($this->xml->channel->item as $item) {
             $namespaces = $item->getNamespaces(true);
-
-            if (isset($namespaces['content'])) {
-                $contentNamespace = $namespaces['content'];
-                $contentEncoded = $item->children($contentNamespace)->encoded;
-                $content = (string) $contentEncoded;
-
-                $content = preg_replace([
-                    '/<!--(.*?)-->/',
-                    '/\s*class="wp-[^"]*"/',
-                    '/\s+/'
-                ], ['','', ' '], $content);
-
-                $content = trim(preg_replace("/[\r\n]+/", "\n", $content));
-
-            } else {
-                $content = '';
-            }
+            $content = isset($namespaces['content'])
+                ? $this->parseContent($item->children($namespaces['content'])->encoded)
+                : '';
 
             $posts[] = new Post(
                 (string) $item->title,
@@ -66,5 +58,28 @@ class WordPressXmlParser
         }
 
         return $posts;
+    }
+
+    /**
+     * Cleans and format the XML content.
+     *
+     * @param SimpleXMLElement|null $content
+     * @return string
+     */
+    private function parseContent(?SimpleXMLElement $content): string
+    {
+        if (!$content) {
+            return '';
+        }
+
+        $content = (string) $content;
+
+        $content = preg_replace([
+            '/<!--(.*?)-->/',
+            '/\s*class="wp-[^"]*"/',
+            '/\s+/'
+        ], ['','', ' '], $content);
+
+        return trim(preg_replace("/[\r\n]+/", "\n", $content));
     }
 }
