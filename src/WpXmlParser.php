@@ -2,7 +2,9 @@
 
 namespace Combizera\WpMigration;
 
+use App\Models\Category;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use SimpleXMLElement;
 use Exception;
 
@@ -45,20 +47,23 @@ class WpXmlParser
         }
 
         foreach ($this->xml->channel->item as $item) {
-            var_dump((string) $item->pubDate);
             $namespaces = $item->getNamespaces(true);
             $content = isset($namespaces['content'])
                 ? $this->parseContent($item->children($namespaces['content'])->encoded)
                 : '';
+
             $publishedAt = isset($item->pubDate)
                 ? $this->parseDate((string) $item->pubDate)
                 : Carbon::now();
+
+            $categories = $this->parseCategories($item);
 
             $posts[] = new Post(
                 (string) $item->title,
                 (string) $item->link,
                 $content,
-                $publishedAt
+                $publishedAt,
+                $categories
             );
         }
 
@@ -106,5 +111,31 @@ class WpXmlParser
         } catch (\Exception $e) {
             return Carbon::now()->format('Y-m-d H:i:s');
         }
+    }
+
+    /**
+     * Parse categories from the XML file
+     *
+     * @param SimpleXMLElement $item
+     * @return array<int> List of category IDs
+     */
+    private function parseCategories(SimpleXMLElement $item): array
+    {
+        $categories = [];
+
+        foreach ($item->category as $category) {
+            $categoryName = trim((string) $category);
+
+            if (!empty($categoryName)) {
+                $existingCategory = Category::query()->firstOrCreate(
+                    ['slug' => Str::slug($categoryName)],
+                    ['name' => $categoryName]
+                );
+
+                $categories[] = $existingCategory->id;
+            }
+        }
+
+        return $categories;
     }
 }

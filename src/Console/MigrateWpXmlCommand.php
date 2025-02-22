@@ -2,6 +2,7 @@
 
 namespace Combizera\WpMigration\Console;
 
+use App\Models\Category;
 use Illuminate\Console\Command;
 use Combizera\WpMigration\WpXmlParser;
 use App\Models\Post;
@@ -30,12 +31,14 @@ class MigrateWpXmlCommand extends Command
             $bar->start();
 
             foreach ($posts as $post) {
-                Post::query()
-                    ->create([
-                        'title' => $post->title,
-                        'slug' => \Str::slug($post->title),
-                        'content' => $post->content,
-                        'created_at' => $post->publishedAt,
+                $categoryId = !empty($post->categories) ? $post->categories[0] : $this->getDefaultCategoryId();
+
+                Post::query()->create([
+                    'title' => $post->title,
+                    'slug' => \Str::slug($post->title),
+                    'content' => $post->content,
+                    'created_at' => $post->publishedAt,
+                    'category_id' => $categoryId,
                 ]);
 
                 $bar->advance();
@@ -48,5 +51,21 @@ class MigrateWpXmlCommand extends Command
         } catch (\Exception $e) {
             $this->error('Error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Get the default category ID
+     *
+     * @return int
+     */
+    private function getDefaultCategoryId(): int
+    {
+        $defaultCategory = Category::query()
+            ->firstOrCreate(
+                ['slug' => 'uncategorized'],
+                ['name' => 'Sem Categoria']
+            );
+
+        return $defaultCategory->id;
     }
 }

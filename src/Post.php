@@ -9,7 +9,8 @@ class Post
         public string $title,
         public string $slug,
         public string $content,
-        public string $publishedAt
+        public string $publishedAt,
+        public array $categories
     )
     {
         //
