@@ -6,6 +6,7 @@ use App\Models\Category;
 use Illuminate\Console\Command;
 use Combizera\WpMigration\WpXmlParser;
 use App\Models\Post;
+use Illuminate\Support\Str;
 
 class MigrateWpXmlCommand extends Command
 {
@@ -33,9 +34,11 @@ class MigrateWpXmlCommand extends Command
             foreach ($posts as $post) {
                 $categoryId = !empty($post->categories) ? $post->categories[0] : $this->getDefaultCategoryId();
 
+                $slug = $this->generateUniqueSlug(Str::slug($post->title), $categoryId);
+
                 Post::query()->create([
                     'title' => $post->title,
-                    'slug' => \Str::slug($post->title),
+                    'slug' => $slug,
                     'content' => $post->content,
                     'created_at' => $post->publishedAt,
                     'category_id' => $categoryId,
@@ -67,5 +70,32 @@ class MigrateWpXmlCommand extends Command
             );
 
         return $defaultCategory->id;
+    }
+
+    /**
+     * Generate a unique slug for the post.
+     * If the slug already exists, append the category slug to make it unique.
+     *
+     * @param string $slug
+     * @param int $categoryId
+     * @return string
+     */
+    private function generateUniqueSlug(string $slug, int $categoryId): string
+    {
+        $categorySlug = Category::query()->find($categoryId)->slug;
+
+        if (!Post::query()->where('slug', $slug)->exists()) {
+            return $slug;
+        }
+
+        $newSlug = Str::slug($categorySlug . '-' . $slug);
+
+        $counter = 1;
+        while (Post::query()->where('slug', $newSlug)->exists()) {
+            $newSlug = Str::slug($categorySlug . '-' . $slug . '-' . $counter);
+            $counter++;
+        }
+
+        return $newSlug;
     }
 }
