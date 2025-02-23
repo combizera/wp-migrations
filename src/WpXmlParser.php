@@ -48,6 +48,17 @@ class WpXmlParser
 
         foreach ($this->xml->channel->item as $item) {
             $namespaces = $item->getNamespaces(true);
+
+            if (!isset($namespaces['wp'])) {
+                continue;
+            }
+
+            //TODO: deixar um log do tipo '150' itens no arquivo xml, '50' itens são do tipo post. Analisando
+            $wpData = $item->children($namespaces['wp']);
+            if (!isset($wpData->post_type) || (string) $wpData->post_type !== 'post') {
+                continue;
+            }
+
             $content = isset($namespaces['content'])
                 ? $this->parseContent($item->children($namespaces['content'])->encoded)
                 : '';
