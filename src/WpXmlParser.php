@@ -10,7 +10,7 @@ use Exception;
 
 class WpXmlParser
 {
-    protected SimpleXMLElement $xml;
+    public SimpleXMLElement $xml;
 
     /**
      * Load the XML file and initialize the parser
