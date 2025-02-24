@@ -149,4 +149,31 @@ class WpXmlParser
 
         return $categories;
     }
+
+    /**
+     * Generate a unique slug for the post.
+     * If the slug already exists in the same category, append a number (ex: slug-1, slug-2).
+     *
+     * @param string $title
+     * @param int $categoryId
+     * @return string
+     */
+    public function parseSlug(string $title, int $categoryId): string
+    {
+        $baseSlug = Str::slug($title);
+
+        if (!\App\Models\Post::query()->where('slug', $baseSlug)->exists()) {
+            return $baseSlug;
+        }
+
+        $counter = 1;
+        $newSlug = $baseSlug . '-' . $counter;
+
+        while (\App\Models\Post::query()->where('slug', $newSlug)->exists()) {
+            $counter++;
+            $newSlug = $baseSlug . '-' . $counter;
+        }
+
+        return $newSlug;
+    }
 }
