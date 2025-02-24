@@ -59,6 +59,8 @@ class WpXmlParser
                 continue;
             }
 
+            $isPublished = $this->parsePublish($item);
+
             $content = isset($namespaces['content'])
                 ? $this->parseContent($item->children($namespaces['content'])->encoded)
                 : '';
@@ -74,7 +76,8 @@ class WpXmlParser
                 (string) $item->link,
                 $content,
                 $publishedAt,
-                $categories
+                $categories,
+                $isPublished
             );
         }
 
@@ -175,5 +178,25 @@ class WpXmlParser
         }
 
         return $newSlug;
+    }
+
+    /**
+     * Determine if the post should be published.
+     * Returns 1 if the status is "publish", otherwise 0.
+     *
+     * @param SimpleXMLElement $item
+     * @return int
+     */
+    private function parsePublish(SimpleXMLElement $item): int
+    {
+        $namespaces = $item->getNamespaces(true);
+
+        if (!isset($namespaces['wp'])) {
+            return 0;
+        }
+
+        $wpData = $item->children($namespaces['wp']);
+
+        return isset($wpData->status) && (string) $wpData->status === 'publish' ? 1 : 0;
     }
 }

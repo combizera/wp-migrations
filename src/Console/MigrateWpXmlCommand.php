@@ -37,11 +37,12 @@ class MigrateWpXmlCommand extends Command
                 $slug = $parser->parseSlug($post->title, $categoryId);
 
                 Post::query()->create([
+                    'category_id' => $categoryId,
                     'title' => $post->title,
                     'slug' => $slug,
                     'content' => $post->content,
+                    'is_published' => $post->isPublished,
                     'created_at' => $post->publishedAt,
-                    'category_id' => $categoryId,
                 ]);
 
                 $bar->advance();
