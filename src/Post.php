@@ -6,12 +6,12 @@ class Post
 {
     public function __construct
     (
+        public array $categories,
         public string $title,
         public string $slug,
         public string $content,
-        public string $publishedAt,
-        public array $categories,
-        public int $isPublished
+        public int $isPublished,
+        public string $createdAt
     )
     {
         //

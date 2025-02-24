@@ -65,19 +65,19 @@ class WpXmlParser
                 ? $this->parseContent($item->children($namespaces['content'])->encoded)
                 : '';
 
-            $publishedAt = isset($item->pubDate)
+            $createdAt = isset($item->pubDate)
                 ? $this->parseDate((string) $item->pubDate)
                 : Carbon::now();
 
             $categories = $this->parseCategories($item);
 
             $posts[] = new Post(
+                $categories,
                 (string) $item->title,
                 (string) $item->link,
                 $content,
-                $publishedAt,
-                $categories,
-                $isPublished
+                $isPublished,
+                $createdAt
             );
         }
 

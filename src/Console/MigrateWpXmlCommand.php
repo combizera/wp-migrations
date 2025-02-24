@@ -42,7 +42,7 @@ class MigrateWpXmlCommand extends Command
                     'slug' => $slug,
                     'content' => $post->content,
                     'is_published' => $post->isPublished,
-                    'created_at' => $post->publishedAt,
+                    'created_at' => $post->createdAt,
                 ]);
 
                 $bar->advance();
@@ -67,7 +67,7 @@ class MigrateWpXmlCommand extends Command
         $defaultCategory = Category::query()
             ->firstOrCreate(
                 ['slug' => 'uncategorized'],
-                ['name' => 'Sem Categoria']
+                ['name' => 'Uncategorized']
             );
 
         return $defaultCategory->id;
