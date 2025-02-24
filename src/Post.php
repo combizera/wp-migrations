@@ -11,7 +11,8 @@ class Post
         public string $slug,
         public string $content,
         public int $isPublished,
-        public string $createdAt
+        public string $createdAt,
+        public string $updatedAt
     )
     {
         //

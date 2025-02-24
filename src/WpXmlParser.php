@@ -69,6 +69,10 @@ class WpXmlParser
                 ? $this->parseDate((string) $item->pubDate)
                 : Carbon::now();
 
+            $updatedAt = isset($wpData->post_modified)
+                ? $this->parseDate((string) $wpData->post_modified)
+                : Carbon::now();
+
             $categories = $this->parseCategories($item);
 
             $posts[] = new Post(
@@ -77,7 +81,8 @@ class WpXmlParser
                 (string) $item->link,
                 $content,
                 $isPublished,
-                $createdAt
+                $createdAt,
+                $updatedAt
             );
         }
 
@@ -108,20 +113,24 @@ class WpXmlParser
     }
 
     /**
-     * Convert WP date format to Laravel `created_at` format
+     * Convert date format to Laravel `created_at` format
      *
-     * @param string $pubDate
+     * @param string $date
      * @return string
      */
-    private function parseDate(string $pubDate): string
+    private function parseDate(string $date): string
     {
         //TODO: no final do comando ele fale quantas postagens estavam sem data
-        if (empty($pubDate)) {
+        if (empty($date)) {
             return Carbon::now()->format('Y-m-d H:i:s');
         }
 
         try {
-            return Carbon::createFromFormat(DATE_RSS, $pubDate)->format('Y-m-d H:i:s');
+            if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $date)) {
+                return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
+            }
+
+            return Carbon::createFromFormat(DATE_RSS, $date)->format('Y-m-d H:i:s');
         } catch (\Exception $e) {
             return Carbon::now()->format('Y-m-d H:i:s');
         }

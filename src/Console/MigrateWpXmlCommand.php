@@ -43,6 +43,7 @@ class MigrateWpXmlCommand extends Command
                     'content' => $post->content,
                     'is_published' => $post->isPublished,
                     'created_at' => $post->createdAt,
+                    'updated_at' => $post->updatedAt,
                 ]);
 
                 $bar->advance();
