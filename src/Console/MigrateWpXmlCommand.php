@@ -26,14 +26,46 @@ class MigrateWpXmlCommand extends Command
             $parser = new WpXmlParser($file);
             $posts = $parser->getPosts();
 
-            $this->info('Starting migration...');
+            $totalItems = count($parser->xml->channel->item ?? []);
+            $totalPosts = count($posts);
+            $totalPublished = count(array_filter($posts, fn($post) => $post->isPublished === 1));
+            $totalUnpublished = $totalPosts - $totalPublished;
 
-            $bar = $this->output->createProgressBar(count($posts));
+            $this->info("📄 XML file: {$file}");
+            $this->info("🔍 Total items: {$totalItems}");
+            $this->info("📝 Total posts: {$totalPosts}");
+            $this->info("📢 Published: {$totalPublished} | ⏳ Draft: {$totalUnpublished}");
+            $this->info("📂 Loading categories...");
+
+            $existingCategories = Category::query()->pluck('slug')->toArray();
+            $newCategories = [];
+
+            foreach ($posts as $post) {
+                foreach ($post->categories as $category) {
+                    if (!in_array($category, $existingCategories)) {
+                        $newCategories[] = $category;
+                        $existingCategories[] = $category;
+                    }
+                }
+            }
+
+            foreach ($newCategories as $categoryName) {
+                Category::query()->firstOrCreate(
+                    ['slug' => Str::slug($categoryName)],
+                    ['name' => $categoryName]
+                );
+            }
+
+            $totalNewCategories = count($newCategories);
+            $this->info("✅  {$totalNewCategories} new categories created.");
+
+            $this->info("📌 Starting post migration...");
+
+            $bar = $this->output->createProgressBar($totalPosts);
             $bar->start();
 
             foreach ($posts as $post) {
                 $categoryId = !empty($post->categories) ? $post->categories[0] : $this->getDefaultCategoryId();
-
                 $slug = $parser->parseSlug($post->title, $categoryId);
 
                 Post::query()->create([
@@ -51,10 +83,9 @@ class MigrateWpXmlCommand extends Command
 
             $bar->finish();
             $this->newLine();
-
-            $this->info(count($posts) . ' posts migrate with success!');
+            $this->info("🎉 {$totalPosts} posts successfully migrated!");
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            $this->error('❌ Error: ' . $e->getMessage());
         }
     }
 
