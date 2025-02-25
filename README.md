@@ -23,7 +23,7 @@ composer require combizera/wordpress-to-laravel-migrator
 Para que o pacote funcione corretamente, alguns itens são necessários:
 
 - [ ] Ter uma `Model` para as Postagens, que necessariamente deve ter o nome de `Post`;
-- [ ] A `Model` deve ter os campos `title`, `slug` e `content`;
+- [ ] A `Model` deve ter os campos `title`, `slug`, `content`, `category_id`, `created_at` e `updated_at`;
 - [ ] Ter um arquivo `.xml` com as postagens do WordPress.
 - [ ] Não esquecer de deixar os campos que serão preenchidos como `fillable` na `Model`.
 

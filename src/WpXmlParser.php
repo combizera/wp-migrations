@@ -33,60 +33,92 @@ class WpXmlParser
     }
 
     /**
-     * Extracts and return an array of posts from the XML file
+     * Extracts and returns an array of posts from the XML file
      *
      * @throws Exception
      * @return array
      */
     public function getPosts(): array
     {
-        $posts = [];
-
         if (!isset($this->xml->channel) || !isset($this->xml->channel->item)) {
             throw new Exception("Invalid XML structure. Channel or items not found.");
         }
 
+        $posts = [];
+
         foreach ($this->xml->channel->item as $item) {
-            $namespaces = $item->getNamespaces(true);
-
-            if (!isset($namespaces['wp'])) {
-                continue;
+            $post = $this->parsePost($item);
+            if ($post) {
+                $posts[] = $post;
             }
-
-            //TODO: deixar um log do tipo '150' itens no arquivo xml, '50' itens são do tipo post. Analisando
-            $wpData = $item->children($namespaces['wp']);
-            if (!isset($wpData->post_type) || (string) $wpData->post_type !== 'post') {
-                continue;
-            }
-
-            $isPublished = $this->parsePublish($item);
-
-            $content = isset($namespaces['content'])
-                ? $this->parseContent($item->children($namespaces['content'])->encoded)
-                : '';
-
-            $createdAt = isset($item->pubDate)
-                ? $this->parseDate((string) $item->pubDate)
-                : Carbon::now();
-
-            $updatedAt = isset($wpData->post_modified)
-                ? $this->parseDate((string) $wpData->post_modified)
-                : Carbon::now();
-
-            $categories = $this->parseCategories($item);
-
-            $posts[] = new Post(
-                $categories,
-                (string) $item->title,
-                (string) $item->link,
-                $content,
-                $isPublished,
-                $createdAt,
-                $updatedAt
-            );
         }
 
         return $posts;
+    }
+
+    /**
+     * Parses a single post item from the XML
+     *
+     * @param SimpleXMLElement $item
+     * @return Post|null
+     */
+    private function parsePost(SimpleXMLElement $item): ?Post
+    {
+        $namespaces = $item->getNamespaces(true);
+
+        if (!$this->isValidPost($item, $namespaces)) {
+            return null;
+        }
+
+        $wpData = $item->children($namespaces['wp']);
+
+        $categories = $this->parseCategories($item);
+        $content = isset($namespaces['content'])
+            ? $this->parseContent($item->children($namespaces['content'])->encoded)
+            : '';
+
+        if (empty(trim($content))) {
+            return null;
+        }
+
+        return new Post(
+            $categories,
+            $this->parseTitle($item),
+            (string) $item->link,
+            $content,
+            $this->parsePublish($item),
+            isset($item->pubDate) ? $this->parseDate((string) $item->pubDate) : Carbon::now(),
+            isset($wpData->post_modified) ? $this->parseDate((string) $wpData->post_modified) : Carbon::now()
+        );
+    }
+
+    /**
+     * Validates if an XML item is a valid WordPress post
+     *
+     * @param SimpleXMLElement $item
+     * @param array $namespaces
+     * @return bool
+     */
+    private function isValidPost(SimpleXMLElement $item, array $namespaces): bool
+    {
+        if (!isset($namespaces['wp'])) {
+            return false;
+        }
+
+        $wpData = $item->children($namespaces['wp']);
+
+        return isset($wpData->post_type) && (string) $wpData->post_type === 'post';
+    }
+
+    /**
+     * Parses the post title safely
+     *
+     * @param SimpleXMLElement $item
+     * @return string
+     */
+    private function parseTitle(SimpleXMLElement $item): string
+    {
+        return isset($item->title) ? trim((string) $item->title) : 'Untitled Post';
     }
 
     /**
@@ -120,7 +152,6 @@ class WpXmlParser
      */
     private function parseDate(string $date): string
     {
-        //TODO: no final do comando ele fale quantas postagens estavam sem data
         if (empty($date)) {
             return Carbon::now()->format('Y-m-d H:i:s');
         }
@@ -151,8 +182,8 @@ class WpXmlParser
 
             if (!empty($categoryName)) {
                 $existingCategory = Category::query()->firstOrCreate(
-                    ['slug' => Str::slug($categoryName)],
-                    ['name' => $categoryName]
+                    ['name' => $categoryName],
+                    ['slug' => Str::slug($categoryName)]
                 );
 
                 $categories[] = $existingCategory->id;
