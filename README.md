@@ -7,6 +7,7 @@
 
 Um pacote para migrar postagens do **WordPress** para **Laravel** de maneira simples e eficiente.
 
+
 ## Instalação
 
 ```bash
@@ -27,10 +28,26 @@ Para que o pacote funcione corretamente, alguns itens são necessários:
 - [ ] Ter um arquivo `.xml` com as postagens do WordPress.
 - [ ] Não esquecer de deixar os campos que serão preenchidos como `fillable` na `Model`.
 
+###  Como Exportar os Arquivos do WordPress para XML
+#### Passo 1: Exportar os Arquivos do WordPress para XML
+
+Acessar o Painel Administrativo do WordPress
+Faça login no painel de administração (wp-admin) do seu site WordPress.
+
+#### Passo 2: Navegar até a Ferramenta de Exportação
+No menu lateral, clique em **"Ferramentas"** e depois em **"Exportar"**.
+
+![Passo_2](images/passo-2.webp)
+
+#### Passo 3: Selecionar o Tipo de Conteúdo a Exportar
+Na tela de exportação, escolha **"Posts"** como o conteúdo a ser exportado.
+![Passo_2](images/passo-3.webp)
+
+#### Passo 4: Iniciar o Download do Arquivo XML
+Role a página até encontrar o botão **"Download do arquivo de exportação"**. Clique no botão para iniciar o download do arquivo XML contendo suas postagens.
+
 ## Utilização
-
 Com todos os itens necessários, basta rodar o comando abaixo:
-
 ```php
 php artisan wp:migrate storage/migration.xml
 ```
