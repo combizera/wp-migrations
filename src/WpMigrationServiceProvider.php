@@ -14,9 +14,10 @@ class WpMigrationServiceProvider extends ServiceProvider
         ]);
     }
 
-
     public function boot(): void
     {
-        \Log::info('WpMigrationServiceProvider running 🔥');
+        if (!$this->app->runningInConsole()) {
+            \Log::info('WpMigrationServiceProvider running 🔥');
+        }
     }
 }
